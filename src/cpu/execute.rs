@@ -3,7 +3,7 @@ use super::Cpu;
 
 impl Cpu {
 
-    pub fn execute(&mut self, inst: u32) {
+    pub fn execute(&mut self, inst: u32) -> bool {
         let opcode = inst & 0x0000007f;
         let rd = ((inst & 0x00000f80) >> 7) as usize;
         let rs1 = ((inst & 0x000f8000) >> 15) as usize;
@@ -366,7 +366,9 @@ impl Cpu {
 
             _ => {
                 dbg!(format!("not implemented yet: opcode {:#x}", opcode));
+                return true;
             }
         }
+        return false;
     }
 }

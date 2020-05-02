@@ -1,6 +1,6 @@
 use super::Cpu;
 //memory size = 128MiB
-pub const MEMORY_SIZE: u64 = 1024 * 128;
+pub const MEMORY_SIZE: u64 = 1024 * 1024 * 128;
 
 
 impl Cpu {
@@ -13,7 +13,7 @@ impl Cpu {
         Self {
             regs,
             pc: 0,
-            memory: binary,
+            memory,
         }
     }
     pub fn increment_pc(&mut self, val: u64) {
@@ -51,11 +51,7 @@ impl Cpu {
         println!("{}", output);
     }
     pub fn fetch(&self) -> u32 {
-        let index = self.pc as usize;
-        return (self.memory[index] as u32)
-            | ((self.memory[index + 1] as u32) << 8)
-            | ((self.memory[index + 2] as u32) << 16)
-            | ((self.memory[index + 3] as u32) << 24);
+        return self.read32(self.pc) as u32;
     }
 
     pub(crate) fn read8(&self, addr: u64) -> u64 {
