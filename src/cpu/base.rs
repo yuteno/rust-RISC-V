@@ -1,10 +1,17 @@
 use super::Cpu;
+//memory size = 128MiB
+pub const MEMORY_SIZE: u64 = 1024 * 128;
 
 
 impl Cpu {
     pub fn new(binary: Vec<u8>) -> Self {
+        let mut memory = vec![0; MEMORY_SIZE as usize];
+        memory.splice(..binary.len(), binary.iter().cloned());
+
+        let mut regs = [0;32];
+        regs[2] = MEMORY_SIZE;
         Self {
-            regs: [0; 32],
+            regs,
             pc: 0,
             memory: binary,
         }
@@ -50,28 +57,66 @@ impl Cpu {
             | ((self.memory[index + 2] as u32) << 16)
             | ((self.memory[index + 3] as u32) << 24);
     }
-    /*
-    pub fn execute(&mut self, inst: u32) {
-        let opcode = inst & 0x0000007f;
-        let rd = ((inst & 0x00000f80) >> 7) as usize;
-        let rs1 = ((inst & 0x000f8000) >> 15) as usize;
-        let rs2 = ((inst & 0x01f00000) >> 20) as usize;
 
-        match opcode {
-            0x13 => {
-                //addi
-                let imm = ((inst & 0xfff00000) as i32 as i64 >> 20) as u64;
-                self.regs[rd] = self.regs[rs1] + imm;
-            }
-            0x33 => {
-                //add
-                self.regs[rd] = self.regs[rs1] + self.regs[rs2];
-            }
-            _ => {
-                dbg!("not implemented yet");
-            }
-        }
-    }*/
+    pub(crate) fn read8(&self, addr: u64) -> u64 {
+        let index = addr as usize;
+        self.memory[index] as u64
+    }
+
+    pub(crate) fn read16(&self, addr: u64) -> u64 {
+        let index = addr as usize;
+        return (self.memory[index] as u64) | ((self.memory[index+1] as u64) << 8);
+    }
+
+    pub(crate) fn read32(&self, addr: u64) -> u64 {
+        let index = addr as usize;
+        return (self.memory[index] as u64)
+        | ((self.memory[index+1] as u64) << 8)
+        | ((self.memory[index+2] as u64) << 16)
+        | ((self.memory[index+3] as u64) << 24);
+    }
+
+    pub(crate) fn read64(&self, addr: u64) -> u64 {
+        let index = addr as usize;
+        return (self.memory[index] as u64)
+        | ((self.memory[index+1] as u64) << 8)
+        | ((self.memory[index+2] as u64) << 16)
+        | ((self.memory[index+3] as u64) << 24)
+        | ((self.memory[index+4] as u64) << 32)
+        | ((self.memory[index+5] as u64) << 40)
+        | ((self.memory[index+6] as u64) << 48)
+        | ((self.memory[index+7] as u64) << 56)
+    }
 
 
+    pub(crate) fn write8(&mut self, addr: u64, val: u64)  {
+        let index = addr as usize;
+        self.memory[index] = val as u8;
+    }
+
+    pub(crate) fn write16(&mut self, addr: u64, val: u64)  {
+        let index = addr as usize;
+        self.memory[index] = (val & 0xff) as u8;
+        self.memory[index+1] = ((val >> 8) & 0xff) as u8;
+    }
+
+    pub(crate) fn write32(&mut self, addr: u64, val: u64)  {
+        let index = addr as usize;
+        self.memory[index] = (val & 0xff) as u8;
+        self.memory[index+1] = ((val >> 8) & 0xff) as u8;
+        self.memory[index+2] = ((val >> 16) & 0xff) as u8;
+        self.memory[index+3] = ((val >> 24) & 0xff) as u8;
+    }
+
+    pub(crate) fn write64(&mut self, addr: u64, val: u64)  {
+        let index = addr as usize;
+        self.memory[index] = (val & 0xff) as u8;
+        self.memory[index+1] = ((val >> 8) & 0xff) as u8;
+        self.memory[index+2] = ((val >> 16) & 0xff) as u8;
+        self.memory[index+3] = ((val >> 24) & 0xff) as u8;
+        self.memory[index+4] = ((val >> 32) & 0xff) as u8;
+        self.memory[index+5] = ((val >> 40) & 0xff) as u8;
+        self.memory[index+6] = ((val >> 48) & 0xff) as u8;
+        self.memory[index+7] = ((val >> 56) & 0xff) as u8;
+    }
 }
