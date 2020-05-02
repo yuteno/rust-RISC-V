@@ -1,0 +1,9 @@
+[package]
+name = "rust_RISC_V"
+version = "0.1.0"
+authors = ["Yosuke Ueno <youten622@yahoo.co.jp>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
