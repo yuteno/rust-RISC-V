@@ -94,7 +94,13 @@ fn main() -> io::Result<()> {
 //        cpu.pc += 4;
         cpu.increment_pc(4);
 
-        cpu.execute(inst);
+        match cpu.execute(inst) {
+            true => break,
+            false => {}
+        };
+        if cpu.get_pc() == 0 {
+            break;
+        }
     }
     cpu.dump_registers();
 
