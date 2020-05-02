@@ -342,8 +342,30 @@ impl Cpu {
                 }
             }
 
+            0x67 => {
+                //jalr
+                let t = self.pc;
+
+                let imm = ((((inst & 0xfff00000) as i32) as i64) >> 20) as u64;
+                self.pc = (self.regs[rs1].wrapping_add(imm)) & !1;
+
+                self.regs[rd] = t;
+            }
+
+            0x6f => {
+                //jal
+                self.regs[rd] = self.pc;
+
+                let imm = (((inst & 0x80000000) as i32 as i64 >> 11) as u64)
+                    | ((inst & 0xff000) as u64)
+                    | (((inst >> 9) & 0x800) as u64)
+                    | (((inst >> 20) & 0x7fe) as u64);
+
+                self.pc = self.pc.wrapping_add(imm).wrapping_sub(4);
+            }
+
             _ => {
-                dbg!("not implemented yet");
+                dbg!(format!("not implemented yet: opcode {:#x}", opcode));
             }
         }
     }
