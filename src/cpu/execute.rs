@@ -134,6 +134,50 @@ impl Cpu {
                     _ => {}
                 }
             }
+
+            0x17 => {
+                //auipc
+                let imm = (inst & 0xfffff000) as i32 as i64 as u64;
+                self.regs[rd] = self.pc.wrapping_add(imm).wrapping_sub(4);
+            }
+
+            0x1b => {
+                let imm = ((inst as i32 as i64) >> 20) as u64;
+
+                let shamt = (imm & 0x1f) as u32;
+                match funct3 {
+                    0x0 => {
+                        //addiw
+                        self.regs[rd] = self.regs[rs1].wrapping_add(imm) as i32 as i64 as u64;
+                    }
+
+                    0x1 => {
+                        //slliw
+                        self.regs[rd] = self.regs[rs1].wrapping_shl(shamt) as i32 as i64 as u64;
+                    }
+
+                    0x5 => {
+                        match funct7 {
+                            0x00 => {
+                                //srliw
+                                self.regs[rd] = (self.regs[rs1] as u32).wrapping_shr(shamt) as i32 as i64 as u64;
+                            }
+
+                            0x20 => {
+                                //sraiw
+                                self.regs[rd] = (self.regs[rs1] as i32).wrapping_shr(shamt) as i64 as u64;
+                            }
+
+                            _ => {}
+                        }
+                    }
+
+                    _ => {}
+                }
+            }
+
+
+
             0x33 => {
                 //add
                 self.regs[rd] = self.regs[rs1] + self.regs[rs2];
