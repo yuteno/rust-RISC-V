@@ -176,8 +176,18 @@ impl Cpu {
                 }
             }
 
+            0x23 => {
+                let imm = (((inst & 0xfe00000) as i32 as i64 >> 20) as u64) | ((inst >> 7) & 0x1f);
+                let addr = self.regs[rs1].wrapping_add(imm);
 
-
+                match funct3 {
+                    0x0 => self.write8(addr, self.regs[rs2]), // sb
+                    0x1 => self.write16(addr, self.regs[rs2]), // sh
+                    0x2 => self.write32(addr, self.regs[rs2]), // sw
+                    0x3 => self.write64(addr, self.regs[rs2]), // sd
+                    _ => {}
+                }
+            }
             0x33 => {
                 //add
                 self.regs[rd] = self.regs[rs1] + self.regs[rs2];
