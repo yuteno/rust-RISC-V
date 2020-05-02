@@ -177,7 +177,7 @@ impl Cpu {
             }
 
             0x23 => {
-                let imm = (((inst & 0xfe00000) as i32 as i64 >> 20) as u64) | ((inst >> 7) & 0x1f);
+                let imm = (((inst & 0xfe00000) as i32 as i64 >> 20) as u64) | (((inst >> 7) & 0x1f)as u64);
                 let addr = self.regs[rs1].wrapping_add(imm);
 
                 match funct3 {
@@ -252,6 +252,96 @@ impl Cpu {
                     _ => {}
                 }
             }
+            0x37 => {
+                //lui
+                self.regs[rd] = (inst & 0xfffff000) as i32 as i64 as u64;
+            }
+
+            0x3b => {
+                let shamt = (self.regs[rs2] & 0x1f) as u32;
+                match (funct3, funct7) {
+                    (0x0, 0x00) => {
+                        //addw
+                        self.regs[rd] = self.regs[rs1].wrapping_add(self.regs[rs2]) as i32 as i64 as u64;
+                    }
+
+                    (0x0, 0x20) => {
+                        //subw
+                        self.regs[rd] = ((self.regs[rs1].wrapping_sub(self.regs[rs2])) as i32) as u64;
+                    }
+
+                    (0x1, 0x00) => {
+                        //sllw
+                        self.regs[rd] = (self.regs[rs1] as u32).wrapping_shl(shamt) as i32 as u64;
+                    }
+
+                    (0x5, 0x00) => {
+                        //srlw
+                        self.regs[rd] = (self.regs[rs1] as u32).wrapping_shr(shamt) as i32 as u64;
+                    }
+
+                    (0x5, 0x20) => {
+                        //sraw
+                        self.regs[rd] = ((self.regs[rs1] as i32) >> (shamt as i32)) as u64;
+                    }
+
+                    _ => {}
+                }
+            }
+
+            0x63 => {
+                let imm = (((inst & 0x80000000) as i32 as i64 >> 19) as u64)
+                    | (((inst & 0x80) << 4) as u64)
+                    | (((inst >> 20) & 0x7e0) as u64)
+                    | (((inst >> 7) & 0x1e) as u64) ;
+
+                match funct3 {
+                    0x0 => {
+                        //beq
+                        if self.regs[rs1] == self.regs[rs2] {
+                            self.pc = self.pc.wrapping_add(imm).wrapping_sub(4);
+                        }
+                    }
+
+                    0x1 => {
+                        //bne
+                        if self.regs[rs1] != self.regs[rs2] {
+                            self.pc = self.pc.wrapping_add(imm).wrapping_sub(4);
+                        }
+                    }
+
+                    0x4 => {
+                        //blt
+                        if (self.regs[rs1] as i64) < (self.regs[rs2] as i64) {
+                            self.pc = self.pc.wrapping_add(imm).wrapping_sub(4);
+                        }
+                    }
+
+                    0x5 => {
+                        //bge
+                        if (self.regs[rs1] as i64) >= (self.regs[rs2] as i64) {
+                            self.pc = self.pc.wrapping_add(imm).wrapping_sub(4);
+                        }
+                    }
+
+                    0x6 => {
+                        //bltu
+                        if self.regs[rs1] < self.regs[rs2] {
+                            self.pc = self.pc.wrapping_add(imm).wrapping_sub(4);
+                        }
+                    }
+
+                    0x7 => {
+                        //bgeu
+                        if self.regs[rs1] >= self.regs[rs2] {
+                            self.pc = self.pc.wrapping_add(imm).wrapping_sub(4);
+                        }
+                    }
+
+                    _ => {}
+                }
+            }
+
             _ => {
                 dbg!("not implemented yet");
             }
