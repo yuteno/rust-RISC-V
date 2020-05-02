@@ -64,9 +64,75 @@ impl Cpu {
             }
 
             0x13 => {
-                //addi
                 let imm = ((inst & 0xfff00000) as i32 as i64 >> 20) as u64;
-                self.regs[rd] = self.regs[rs1] + imm;
+                let shamt = (imm & 0x3f) as u32;
+                match funct3 {
+                    0x0 => {
+                        //addi
+                        self.regs[rd] = self.regs[rs1].wrapping_add(imm);
+                    }
+
+                    0x0 => {
+                        //addi
+                        self.regs[rd] = self.regs[rs1].wrapping_add(imm);
+                    }
+
+                    0x1 => {
+                        //slli
+                        self.regs[rd] = self.regs[rs1] << shamt;
+                    }
+
+                    0x2 => {
+                        //slti
+                        self.regs[rd] = if (self.regs[rs1] as i64) < (imm as i64) {
+                            1
+                        } else {
+                            0
+                        };
+                    }
+
+                    0x3 => {
+                        //sltiu
+                        self.regs[rd] = if self.regs[rs1] < imm {
+                            1
+                        } else {
+                            0
+                        };
+                    }
+
+                    0x4 => {
+                        //xori
+                        self.regs[rd] = self.regs[rs1] ^ imm;
+                    }
+
+                    0x5 => {
+                        match funct7 >> 1 {
+                            0x00 => {
+                                //srli
+                                self.regs[rd] = self.regs[rs1].wrapping_shr(shamt);
+                            }
+
+                            0x10 => {
+                                //srai
+                                self.regs[rd] = (self.regs[rs1] as i64).wrapping_shr(shamt) as u64;
+                            }
+
+                            _ => {}
+                        }
+                    }
+
+                    0x6 => {
+                        //ori
+                        self.regs[rd] = self.regs[rs1] | imm;
+                    }
+
+                    0x7 => {
+                        //andi
+                        self.regs[rd] = self.regs[rs1] & imm;
+                    }
+
+                    _ => {}
+                }
             }
             0x33 => {
                 //add
