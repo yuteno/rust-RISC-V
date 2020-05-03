@@ -1,13 +1,16 @@
 use super::Cpu;
+use crate::memory::MEMORY_SIZE;
+use crate::memory::Memory;
 //memory size = 128MiB
-pub const MEMORY_SIZE: u64 = 1024 * 1024 * 128;
 
 impl Cpu {
     pub fn new(binary: Vec<u8>) -> Self {
-        let mut memory = vec![0; MEMORY_SIZE as usize];
-        memory.splice(..binary.len(), binary.iter().cloned());
+        //let mut memory = vec![0; MEMORY_SIZE as usize];
+        //memory.splice(..binary.len(), binary.iter().cloned());
 
         let mut regs = [0; 32];
+        let mut memory = Memory::new();
+        memory.set_dram(binary);
         regs[2] = MEMORY_SIZE;
         Self {
             regs,
@@ -24,8 +27,9 @@ impl Cpu {
     }
 
     pub fn get_memlen(&self) -> u64 {
-        self.memory.len() as u64
+        self.memory.size() as u64
     }
+
 
     pub fn dump_registers(&self) {
         let mut output = String::from("");
@@ -48,10 +52,11 @@ impl Cpu {
         }
         println!("{}", output);
     }
-    pub fn fetch(&self) -> u32 {
-        return self.read32(self.pc) as u32;
-    }
 
+    pub fn fetch(&self) -> u32 {
+        return self.memory.read32(self.pc) as u32;
+    }
+    /*
     pub(crate) fn read8(&self, addr: u64) -> u64 {
         let index = addr as usize;
         self.memory[index] as u64
@@ -112,4 +117,5 @@ impl Cpu {
         self.memory[index + 6] = ((val >> 48) & 0xff) as u8;
         self.memory[index + 7] = ((val >> 56) & 0xff) as u8;
     }
+    */
 }

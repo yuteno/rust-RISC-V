@@ -3,8 +3,8 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
-mod cpu;
-
+pub mod cpu;
+pub mod memory;
 /*
 struct Cpu {
     regs: [u64; 32],

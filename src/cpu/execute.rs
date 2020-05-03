@@ -18,43 +18,43 @@ impl Cpu {
                 match funct3 {
                     0x0 => {
                         //lb
-                        let val = self.read8(addr);
+                        let val = self.memory.read8(addr);
                         self.regs[rd] = val as i8 as i64 as u64;
                     }
 
                     0x1 => {
                         //lh
-                        let val = self.read16(addr);
+                        let val = self.memory.read16(addr);
                         self.regs[rd] = val as i16 as i64 as u64;
                     }
 
                     0x2 => {
                         //lw
-                        let val = self.read32(addr);
+                        let val = self.memory.read32(addr);
                         self.regs[rd] = val as i32 as i64 as u64;
                     }
 
                     0x3 => {
                         //ld
-                        let val = self.read64(addr);
+                        let val = self.memory.read64(addr);
                         self.regs[rd] = val;
                     }
 
                     0x4 => {
                         //lbu
-                        let val = self.read8(addr);
+                        let val = self.memory.read8(addr);
                         self.regs[rd] = val;
                     }
 
                     0x5 => {
                         //lhu
-                        let val = self.read16(addr);
+                        let val = self.memory.read16(addr);
                         self.regs[rd] = val;
                     }
 
                     0x6 => {
                         //lwu
-                        let val = self.read32(addr);
+                        let val = self.memory.read32(addr);
                         self.regs[rd] = val;
                     }
                     _ => {}
@@ -65,11 +65,6 @@ impl Cpu {
                 let imm = ((inst & 0xfff00000) as i32 as i64 >> 20) as u64;
                 let shamt = (imm & 0x3f) as u32;
                 match funct3 {
-                    0x0 => {
-                        //addi
-                        self.regs[rd] = self.regs[rs1].wrapping_add(imm);
-                    }
-
                     0x0 => {
                         //addi
                         self.regs[rd] = self.regs[rs1].wrapping_add(imm);
@@ -178,10 +173,10 @@ impl Cpu {
                 let addr = self.regs[rs1].wrapping_add(imm);
 
                 match funct3 {
-                    0x0 => self.write8(addr, self.regs[rs2]),  // sb
-                    0x1 => self.write16(addr, self.regs[rs2]), // sh
-                    0x2 => self.write32(addr, self.regs[rs2]), // sw
-                    0x3 => self.write64(addr, self.regs[rs2]), // sd
+                    0x0 => self.memory.write8(addr, self.regs[rs2]),  // sb
+                    0x1 => self.memory.write16(addr, self.regs[rs2]), // sh
+                    0x2 => self.memory.write32(addr, self.regs[rs2]), // sw
+                    0x3 => self.memory.write64(addr, self.regs[rs2]), // sd
                     _ => {}
                 }
             }
