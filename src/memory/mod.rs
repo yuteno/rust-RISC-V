@@ -1,4 +1,4 @@
-pub mod memory;
+pub mod memory_main;
 
 pub const MEMORY_SIZE: u64 = 1024 * 1024 * 128;
 

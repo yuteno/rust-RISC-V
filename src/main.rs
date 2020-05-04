@@ -5,6 +5,7 @@ use std::io::prelude::*;
 
 pub mod cpu;
 pub mod memory;
+pub mod csr;
 /*
 struct Cpu {
     regs: [u64; 32],

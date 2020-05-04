@@ -9,7 +9,6 @@ impl Memory {
         }
     }
 
-
     pub fn size(&self) -> u64 {
         self.code_size
     }

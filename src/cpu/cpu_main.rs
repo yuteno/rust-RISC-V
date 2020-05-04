@@ -1,7 +1,8 @@
 use super::Cpu;
 use crate::memory::MEMORY_SIZE;
 use crate::memory::Memory;
-//memory size = 128MiB
+use super::mode::Mode;
+use crate::csr::*;
 
 impl Cpu {
     pub fn new(binary: Vec<u8>) -> Self {
@@ -16,6 +17,8 @@ impl Cpu {
             regs,
             pc: 0,
             memory,
+            mode: Mode::Machine,
+            state: State::new(),
         }
     }
     pub fn increment_pc(&mut self, val: u64) {
