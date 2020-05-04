@@ -1,11 +1,5 @@
-use super::exception::Exception;
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
-pub enum Mode {
-    User = 0b00,
-    Supervisor = 0b01,
-    Machine = 0b11,
-    Debug,
-}
+use crate::exception::Exception;
+use super::Mode;
 
 impl Mode {
     pub fn require(&self, require: Mode) ->  Result<(), Exception>{

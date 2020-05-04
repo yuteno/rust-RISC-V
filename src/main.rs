@@ -6,6 +6,7 @@ use std::io::prelude::*;
 pub mod cpu;
 pub mod memory;
 pub mod csr;
+pub mod exception;
 /*
 struct Cpu {
     regs: [u64; 32],

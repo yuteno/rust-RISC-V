@@ -1,7 +1,7 @@
 use super::Cpu;
 use crate::memory::MEMORY_SIZE;
 use crate::memory::Memory;
-use super::mode::Mode;
+use super::Mode;
 use crate::csr::*;
 
 impl Cpu {
